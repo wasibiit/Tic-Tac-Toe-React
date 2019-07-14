@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import Board from './Board';
 
 
@@ -14,24 +14,71 @@ function calculateWinner(squares) {
         [0, 4, 8],
         [2, 4, 6]
     ];
-
     for (let i = 0; i < lines.length; i++) {
         const [a, b, c] = lines[i];
         if (squares[a] && squares[a] === squares[b] && squares[b] === squares[c]) {
             return squares[a];
         }
-        if (squares[a] === squares[b]) {
-            if (squares[a] && squares[b] === 'X') {
-                return squares[c] = 'O';
-            }else if (squares[a] && squares[b] === 'O') {
-                return squares[c] = 'X';
-            }
-         } else if (squares[a] === 'X') {
-             return squares[b] = 'O';
-         }
     }
 
     return null;
+}
+
+function calculateAiMove(squares) {
+    let moveDone = false;
+    const lines = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6]
+    ];
+    for (let i = 0; i < lines.length; i++) {
+        const [a, b, c] = lines[i];
+        if (squares[a] == 'O' && squares[b] == 'O' && squares[c] == null) {
+            squares[c] = 'O'
+            moveDone = true;
+            break;
+        } else if (squares[a] == 'O' && squares[c] == 'O' && squares[b] == null) {
+            squares[b] = 'O'
+            moveDone = true;
+            break;
+        } else if (squares[c] == 'O' && squares[b] == 'O' && squares[a] == null) {
+            squares[a] = 'O'
+            moveDone = true;
+            break;
+        }
+    }
+    if (moveDone == false) {
+        for (let i = 0; i < lines.length; i++) {
+            const [a, b, c] = lines[i];
+            if (squares[a] == 'X' && squares[b] == 'X' && squares[c] == null) {
+                squares[c] = 'O'
+                moveDone = true;
+                break;
+            } else if (squares[a] == 'X' && squares[c] == 'X' && squares[b] == null) {
+                squares[b] = 'O'
+                moveDone = true;
+                break;
+            } else if (squares[c] == 'X' && squares[b] == 'X' && squares[a] == null) {
+                squares[a] = 'O'
+                moveDone = true;
+                break;
+            }
+        }
+    }
+    let emptySquares = [];
+    if (moveDone == false) {
+        for (let i = 0; i < squares.length; i++) {
+            if (squares[i] == null)
+                emptySquares.push(i);
+        }
+        squares[emptySquares[Math.floor(Math.random() * emptySquares.length)]] = 'O';
+    }
+    return squares;
 }
 
 class Game extends Component {
@@ -41,26 +88,33 @@ class Game extends Component {
             xIsNext: true,
             stepNumber: 0,
             history: [
-                { squares: Array(9).fill(null) }
+                {squares: Array(9).fill(null)}
             ]
         }
     }
-    jumpTo(step){
+
+    jumpTo(step) {
         this.setState({
             stepNumber: step,
-            xIsNext: (step%2)===0
+            xIsNext: (step % 2) === 0
         })
     }
 
     handleClick(i) {
         const history = this.state.history.slice(0, this.state.stepNumber + 1);
         const current = history[history.length - 1];
-        const squares = current.squares.slice();
-        const winner = calculateWinner(squares);
-        if (winner || squares[i]) {
+        let squares = current.squares.slice();
+        let winner = calculateWinner(squares);
+        console.log(winner)
+        if (winner) {
             return;
         }
-        squares[i] = this.state.xIsNext ? 'X' : 'O';
+        squares[i] = 'X';
+         winner = calculateWinner(squares);
+        console.log(winner)
+        if (!winner) {
+            squares = calculateAiMove(squares);
+        }
         this.setState({
             history: history.concat({
                 squares: squares
@@ -68,7 +122,6 @@ class Game extends Component {
             xIsNext: !this.state.xIsNext,
             stepNumber: history.length
         });
-
     }
 
     render() {
@@ -79,7 +132,9 @@ class Game extends Component {
             const desc = move ? 'Go to #' + move : 'Start the Game';
             return (
                 <li key={move}>
-                    <button onClick={() => { this.jumpTo(move) }}>
+                    <button onClick={() => {
+                        this.jumpTo(move)
+                    }}>
                         {desc}
                     </button>
                 </li>
@@ -97,7 +152,7 @@ class Game extends Component {
             <div className="game">
                 <div className="game-board">
                     <Board onClick={(i) => this.handleClick(i)}
-                        squares={current.squares} />
+                           squares={current.squares}/>
                 </div>
                 <div className="game-info">
                     <div>{status}</div>
