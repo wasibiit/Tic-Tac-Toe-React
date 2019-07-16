@@ -15,7 +15,7 @@ class Board extends Component {
                     {this.renderSquare(1)}
                     {this.renderSquare(2)}
                 </div>
-                <div className="border-row">
+                <div className="border-row">    
                     {this.renderSquare(3)}
                     {this.renderSquare(4)}
                     {this.renderSquare(5)}

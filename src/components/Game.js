@@ -38,43 +38,52 @@ function calculateAiMove(squares) {
     ];
     for (let i = 0; i < lines.length; i++) {
         const [a, b, c] = lines[i];
-        if (squares[a] == 'O' && squares[b] == 'O' && squares[c] == null) {
+        if (squares[a] === 'O' && squares[b] === 'O' && squares[c] === null) {
             squares[c] = 'O'
             moveDone = true;
             break;
-        } else if (squares[a] == 'O' && squares[c] == 'O' && squares[b] == null) {
+        } else if (squares[a] === 'O' && squares[c] === 'O' && squares[b] === null) {
             squares[b] = 'O'
             moveDone = true;
             break;
-        } else if (squares[c] == 'O' && squares[b] == 'O' && squares[a] == null) {
+        } else if (squares[c] === 'O' && squares[b] === 'O' && squares[a] === null) {
             squares[a] = 'O'
             moveDone = true;
             break;
         }
-    }
-    if (moveDone == false) {
-        for (let i = 0; i < lines.length; i++) {
-            const [a, b, c] = lines[i];
-            if (squares[a] == 'X' && squares[b] == 'X' && squares[c] == null) {
-                squares[c] = 'O'
-                moveDone = true;
-                break;
-            } else if (squares[a] == 'X' && squares[c] == 'X' && squares[b] == null) {
-                squares[b] = 'O'
-                moveDone = true;
-                break;
-            } else if (squares[c] == 'X' && squares[b] == 'X' && squares[a] == null) {
-                squares[a] = 'O'
-                moveDone = true;
-                break;
-            }
+        if (moveDone == false) {
+          if (squares[a] === 'X' && squares[b] === 'X' && squares[c] === null) {
+              squares[c] = 'O'
+              moveDone = true;
+              break;
+          } else if (squares[a] === 'X' && squares[c] === 'X' && squares[b] === null) {
+              squares[b] = 'O'
+              moveDone = true;
+              break;
+          } else if (squares[c] === 'X' && squares[b] === 'X' && squares[a] === null) {
+              squares[a] = 'O'
+              moveDone = true;
+              break;
         }
+      }
     }
+
     let emptySquares = [];
-    if (moveDone == false) {
+    if (moveDone === false) {
         for (let i = 0; i < squares.length; i++) {
-            if (squares[i] == null)
-                emptySquares.push(i);
+            if (squares[i] === null) {
+              emptySquares.push(i);
+            } else if (squares[i] && squares[i + 1] === 'O') {
+              if (squares[i + 2 === null]) {
+                squares[i + 2] = 'O';
+                break;
+              }
+            } else if (squares[i] && squares[i + 2] === 'O') {
+              if(squares[i + 1] === null ) {
+                squares[i + 1] = 'O';
+                break;
+              }
+            }
         }
         squares[emptySquares[Math.floor(Math.random() * emptySquares.length)]] = 'O';
     }
@@ -105,7 +114,7 @@ class Game extends Component {
         const current = history[history.length - 1];
         let squares = current.squares.slice();
         let winner = calculateWinner(squares);
-        console.log(winner)
+        // console.log(winner);
         if (winner) {
             return;
         }
@@ -129,17 +138,17 @@ class Game extends Component {
         const current = history[this.state.stepNumber];
         const winner = calculateWinner(current.squares);
         const moves = history.map((step, move) => {
-            const desc = move ? 'Go to #' + move : 'Start the Game';
-            return (
-                <li key={move}>
-                    <button onClick={() => {
-                        this.jumpTo(move)
-                    }}>
-                        {desc}
-                    </button>
-                </li>
-            )
-        });
+        const desc = move ? 'Go to #' + move : 'Start the Game';
+        return (
+          <li key={move}>
+            <button onClick={() => {
+                this.jumpTo(move)
+              }}>
+                  {desc}
+            </button>
+          </li>
+      )
+  });
         let status;
         if (winner) {
             status = 'Winner is ' + winner;
